@@ -74,5 +74,5 @@ export interface AppState {
   settings: NotificationSettings;
   isLoading: boolean;
   lastUpdate: number | null;
-  activeTab: 'watchlist' | 'alerts' | 'settings' | 'analysis' | 'download';
+  activeTab: 'watchlist' | 'alerts' | 'settings' | 'analysis';
 }

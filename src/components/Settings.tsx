@@ -1,9 +1,11 @@
 import { NotificationSettings } from '../types';
 import { 
   Bell, Mail, Send, MessageCircle, Twitter, 
-  Save, ToggleLeft, ToggleRight, Shield
+  Save, ToggleLeft, ToggleRight, Shield, Download, Loader2
 } from 'lucide-react';
 import { useState } from 'react';
+import JSZip from 'jszip';
+import { saveAs } from 'file-saver';
 
 interface SettingsProps {
   settings: NotificationSettings;
@@ -14,6 +16,96 @@ interface SettingsProps {
 export default function Settings({ settings, onUpdate, onRequestNotification }: SettingsProps) {
   const [localSettings, setLocalSettings] = useState(settings);
   const [saved, setSaved] = useState(false);
+  const [downloading, setDownloading] = useState(false);
+
+  const downloadProject = async () => {
+    setDownloading(true);
+    try {
+      const zip = new JSZip();
+      const project = zip.folder('SMC-Analyzer')!;
+
+      // Fetch all project files
+      const files = [
+        { path: 'config.json', url: '/config.json' },
+        { path: 'Run.bat', url: '/Run.bat' },
+        { path: 'requirements.txt', url: '/requirements.txt' },
+        { path: 'README.md', url: '/README.md' },
+        { path: 'server/server.js', url: '/server/server.js' },
+        { path: 'server/package.json', url: '/server/package.json' },
+      ];
+
+      for (const file of files) {
+        try {
+          const response = await fetch(file.url);
+          const content = await response.text();
+          project.file(file.path, content);
+        } catch (e) {
+          console.warn(`Failed to fetch ${file.path}:`, e);
+        }
+      }
+
+      // Add package.json for frontend
+      const frontendPackageJson = {
+        name: "smc-analyzer",
+        version: "1.0.0",
+        private: true,
+        type: "module",
+        scripts: {
+          dev: "vite",
+          build: "vite build",
+          preview: "vite preview"
+        },
+        dependencies: {
+          react: "^18.2.0",
+          "react-dom": "^18.2.0",
+          recharts: "^2.10.0",
+          "lucide-react": "^0.294.0",
+          jszip: "^3.10.1",
+          "file-saver": "^2.0.5"
+        },
+        devDependencies: {
+          "@vitejs/plugin-react": "^4.3.4",
+          vite: "^6.3.5",
+          tailwindcss: "^4.1.7",
+          "@tailwindcss/vite": "^4.1.7",
+          typescript: "^5.7.0"
+        }
+      };
+      project.file('package.json', JSON.stringify(frontendPackageJson, null, 2));
+
+      // Add index.html
+      const indexHtml = `<!doctype html>
+<html lang="fa" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>داشبورد تحلیل هوشمند ارز دیجیتال - SMC & Dow Theory</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <style>
+      * { font-family: 'Vazirmatn', sans-serif !important; }
+      html, body { margin: 0; padding: 0; width: 100%; height: 100%; }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>`;
+      project.file('index.html', indexHtml);
+
+      // Generate and download ZIP
+      const blob = await zip.generateAsync({ type: 'blob' });
+      saveAs(blob, 'SMC-Analyzer.zip');
+    } catch (error) {
+      console.error('Download error:', error);
+      alert('خطا در دانلود فایل‌ها. لطفاً دوباره تلاش کنید.');
+    } finally {
+      setDownloading(false);
+    }
+  };
 
   const handleSave = () => {
     onUpdate(localSettings);
@@ -33,6 +125,49 @@ export default function Settings({ settings, onUpdate, onRequestNotification }: 
 
   return (
     <div className="space-y-6 animate-fade-in max-w-4xl">
+      {/* Download Button */}
+      <div className="bg-gradient-to-l from-accent2/10 to-accent3/10 rounded-2xl p-5 border border-accent2/20">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-accent2 to-accent3 flex items-center justify-center shadow-lg">
+              <Download className="w-6 h-6 text-white" />
+            </div>
+            <div>
+              <h3 className="font-bold text-text">دانلود کامل برنامه</h3>
+              <p className="text-xs text-gray-dark mt-0.5">
+                تمام فایل‌های پروژه شامل سرور، تنظیمات و اسکریپت اجرا
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={downloadProject}
+            disabled={downloading}
+            className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-accent2 text-white text-sm font-medium hover:bg-accent2/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-md"
+          >
+            {downloading ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin" />
+                در حال آماده‌سازی...
+              </>
+            ) : (
+              <>
+                <Download className="w-4 h-4" />
+                دانلود ZIP
+              </>
+            )}
+          </button>
+        </div>
+        <div className="mt-3 pt-3 border-t border-accent2/10">
+          <p className="text-xs text-gray-dark leading-6">
+            📦 فایل ZIP شامل: <code className="bg-white px-1.5 py-0.5 rounded text-[10px]">Run.bat</code> (اجرای خودکار)، 
+            <code className="bg-white px-1.5 py-0.5 rounded text-[10px] mr-1">config.json</code> (تنظیمات)، 
+            <code className="bg-white px-1.5 py-0.5 rounded text-[10px] mr-1">server/</code> (سرور بک‌اند)، 
+            <code className="bg-white px-1.5 py-0.5 rounded text-[10px] mr-1">requirements.txt</code> (ملزومات)
+          </p>
+        </div>
+      </div>
+
+      {/* Settings Header */}
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-xl font-bold text-text flex items-center gap-2">

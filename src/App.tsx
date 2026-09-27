@@ -6,7 +6,6 @@ import Watchlist from './components/Watchlist';
 import Alerts from './components/Alerts';
 import Settings from './components/Settings';
 import AnalysisPanel from './components/AnalysisPanel';
-import DownloadGuide from './components/DownloadGuide';
 import Sidebar from './components/Sidebar';
 import Header from './components/Header';
 
@@ -45,7 +44,7 @@ function App() {
     settings: JSON.parse(localStorage.getItem('notificationSettings') || JSON.stringify(DEFAULT_SETTINGS)),
     isLoading: true,
     lastUpdate: null,
-    activeTab: 'download',
+    activeTab: 'watchlist',
   });
 
   const [coinData, setCoinData] = useState<CoinData[]>([]);
@@ -195,9 +194,6 @@ function App() {
               watchlist={state.watchlist}
               coinData={coinData}
             />
-          )}
-          {state.activeTab === 'download' && (
-            <DownloadGuide />
           )}
         </main>
       </div>
