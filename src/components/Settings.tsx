@@ -24,8 +24,8 @@ export default function Settings({ settings, onUpdate, onRequestNotification }: 
       const zip = new JSZip();
       const project = zip.folder('SMC-Analyzer')!;
 
-      // Fetch all project files
-      const files = [
+      // Fetch all project files (public files)
+      const publicFiles = [
         { path: 'config.json', url: '/config.json' },
         { path: 'Run.bat', url: '/Run.bat' },
         { path: 'requirements.txt', url: '/requirements.txt' },
@@ -34,11 +34,33 @@ export default function Settings({ settings, onUpdate, onRequestNotification }: 
         { path: 'server/package.json', url: '/server/package.json' },
       ];
 
-      for (const file of files) {
+      // Fetch source code files
+      const sourceFiles = [
+        { path: 'src/App.tsx', url: '/source/App.tsx' },
+        { path: 'src/main.tsx', url: '/source/main.tsx' },
+        { path: 'src/types.ts', url: '/source/types.ts' },
+        { path: 'src/index.css', url: '/source/index.css' },
+        { path: 'src/utils/api.ts', url: '/source/utils/api.ts' },
+        { path: 'src/utils/analysis.ts', url: '/source/utils/analysis.ts' },
+        { path: 'src/components/Sidebar.tsx', url: '/source/components/Sidebar.tsx' },
+        { path: 'src/components/Header.tsx', url: '/source/components/Header.tsx' },
+        { path: 'src/components/Watchlist.tsx', url: '/source/components/Watchlist.tsx' },
+        { path: 'src/components/Alerts.tsx', url: '/source/components/Alerts.tsx' },
+        { path: 'src/components/Settings.tsx', url: '/source/components/Settings.tsx' },
+        { path: 'src/components/AnalysisPanel.tsx', url: '/source/components/AnalysisPanel.tsx' },
+      ];
+
+      const allFiles = [...publicFiles, ...sourceFiles];
+
+      for (const file of allFiles) {
         try {
           const response = await fetch(file.url);
-          const content = await response.text();
-          project.file(file.path, content);
+          if (response.ok) {
+            const content = await response.text();
+            project.file(file.path, content);
+          } else {
+            console.warn(`File not found: ${file.path}`);
+          }
         } catch (e) {
           console.warn(`Failed to fetch ${file.path}:`, e);
         }
@@ -72,6 +94,47 @@ export default function Settings({ settings, onUpdate, onRequestNotification }: 
         }
       };
       project.file('package.json', JSON.stringify(frontendPackageJson, null, 2));
+
+      // Add vite.config.js
+      const viteConfig = `import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+import tailwindcss from '@tailwindcss/vite';
+
+export default defineConfig({
+  plugins: [react(), tailwindcss()],
+  server: {
+    port: 5173,
+  },
+  build: {
+    outDir: 'dist',
+  },
+});
+`;
+      project.file('vite.config.js', viteConfig);
+
+      // Add tsconfig.json
+      const tsConfig = {
+        compilerOptions: {
+          target: "ES2020",
+          useDefineForClassFields: true,
+          lib: ["ES2020", "DOM", "DOM.Iterable"],
+          module: "ESNext",
+          skipLibCheck: true,
+          moduleResolution: "bundler",
+          allowImportingTsExtensions: true,
+          resolveJsonModule: true,
+          isolatedModules: true,
+          noEmit: true,
+          jsx: "react-jsx",
+          strict: true,
+          noUnusedLocals: true,
+          noUnusedParameters: true,
+          noFallthroughCasesInSwitch: true
+        },
+        include: ["src"],
+        references: [{ path: "./tsconfig.node.json" }]
+      };
+      project.file('tsconfig.json', JSON.stringify(tsConfig, null, 2));
 
       // Add index.html
       const indexHtml = `<!doctype html>
