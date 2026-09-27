@@ -1,0 +1,50 @@
+# ملزومات مورد نیاز برای اجرای برنامه
+# Requirements for SMC Analyzer
+
+## پیش‌نیازهای سیستم:
+1. Node.js نسخه 18 یا بالاتر (https://nodejs.org)
+2. npm نسخه 9 یا بالاتر (همراه Node.js نصب می‌شود)
+3. مرورگر Google Chrome یا Microsoft Edge (نسخه جدید)
+
+## اکستنشن مرورگر:
+- Extension Bridge (برای حل مشکل CORS و فیلتر IP)
+- لینک دانلود: از فروشگاه کروم وب نصب کنید
+
+## پکیج‌های Node.js (سرور):
+express@4.18.2
+cors@2.8.5
+node-fetch@2.7.0
+nodemailer@6.9.7
+node-telegram-bot-api@0.64.0
+discord.js@14.14.1
+twitter-api-v2@1.15.2
+ws@8.14.2
+dotenv@16.3.1
+
+## پکیج‌های فرانت‌اند (نصب خودکار):
+react@18.2.0
+react-dom@18.2.0
+recharts@2.10.0
+lucide-react@0.294.0
+tailwindcss@4.1.7
+
+## APIهای مورد استفاده:
+1. CoinGecko API (عمومی - بدون نیاز به کلید)
+2. CoinMarketCap API (عمومی - کلید اختیاری)
+3. Bitunix API (عمومی - کلید اختیاری)
+4. Toobit API (عمومی - کلید اختیاری)
+
+## تنظیمات اختیاری:
+- SMTP Server (برای ارسال ایمیل)
+- Telegram Bot Token (برای ارسال پیام تلگرام)
+- Discord Webhook URL (برای ارسال پیام دیسکورد)
+- Twitter API Keys (برای انتشار توییت)
+
+## پورت‌های مورد نیاز:
+- 3000: سرور بک‌اند
+- 5173: سرور توسعه Vite (فقط در حالت توسعه)
+
+## سیستم عامل‌های پشتیبانی شده:
+- Windows 10/11
+- macOS 12+
+- Linux (Ubuntu 20.04+)

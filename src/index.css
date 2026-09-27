@@ -1,1 +1,68 @@
 @import "tailwindcss";
+
+@theme {
+  --color-primary: #FE7A15;
+  --color-secondary: #D3DD18;
+  --color-accent1: #F8D90F;
+  --color-accent2: #0191B4;
+  --color-accent3: #35BBCA;
+  --color-cream: #FFF8F0;
+  --color-cream-dark: #F5EDE3;
+  --color-gray-light: #F0EDED;
+  --color-gray-mid: #B8B0A8;
+  --color-gray-dark: #6B6560;
+  --color-text: #2D2A27;
+}
+
+body {
+  font-family: 'Vazirmatn', sans-serif;
+  background-color: #FFF8F0;
+  color: #2D2A27;
+  direction: rtl;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #F0EDED;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #B8B0A8;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #6B6560;
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 5px rgba(254, 122, 21, 0.3); }
+  50% { box-shadow: 0 0 20px rgba(254, 122, 21, 0.6); }
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s infinite;
+}
+
+@keyframes slide-in {
+  from { transform: translateX(100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+.animate-slide-in {
+  animation: slide-in 0.3s ease-out;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.4s ease-out;
+}

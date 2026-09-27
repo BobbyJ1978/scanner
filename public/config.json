@@ -1,0 +1,94 @@
+{
+  "server": {
+    "port": 3000,
+    "host": "localhost",
+    "cors": {
+      "enabled": true,
+      "origins": ["*"]
+    }
+  },
+  "api": {
+    "coingecko": {
+      "baseUrl": "https://api.coingecko.com/api/v3",
+      "apiKey": "",
+      "rateLimit": 30
+    },
+    "coinmarketcap": {
+      "baseUrl": "https://pro-api.coinmarketcap.com/v1",
+      "apiKey": "",
+      "rateLimit": 30
+    },
+    "bitunix": {
+      "baseUrl": "https://openapi.bitunix.com",
+      "apiKey": "",
+      "apiSecret": "",
+      "rateLimit": 60
+    },
+    "toobit": {
+      "baseUrl": "https://api.toobit.com",
+      "apiKey": "",
+      "apiSecret": "",
+      "rateLimit": 60
+    }
+  },
+  "extensionBridge": {
+    "enabled": true,
+    "proxyUrl": "https://api.allorigins.win/raw?url=",
+    "fallbackProxy": "https://corsproxy.io/?",
+    "timeout": 30000,
+    "retries": 3
+  },
+  "notifications": {
+    "browser": {
+      "enabled": true
+    },
+    "email": {
+      "enabled": false,
+      "smtp": {
+        "host": "",
+        "port": 587,
+        "secure": false,
+        "user": "",
+        "pass": ""
+      },
+      "recipients": []
+    },
+    "telegram": {
+      "enabled": false,
+      "botToken": "",
+      "chatId": ""
+    },
+    "discord": {
+      "enabled": false,
+      "webhookUrl": ""
+    },
+    "twitter": {
+      "enabled": false,
+      "apiKey": "",
+      "apiSecret": "",
+      "accessToken": "",
+      "accessSecret": ""
+    }
+  },
+  "analysis": {
+    "dowTheory": {
+      "enabled": true,
+      "weight": 0.4,
+      "period": 7,
+      "minSwings": 3
+    },
+    "smc": {
+      "enabled": true,
+      "weight": 0.6,
+      "orderBlock": { "enabled": true, "sensitivity": 0.02 },
+      "fairValueGap": { "enabled": true, "minGapPercent": 0.5 },
+      "breakOfStructure": { "enabled": true },
+      "liquidityZones": { "enabled": true, "clusterThreshold": 0.02 }
+    },
+    "watchlist": {
+      "maxCoins": 10,
+      "minScore": 50,
+      "refreshInterval": 300
+    }
+  }
+}
