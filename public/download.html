@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SMC Analyzer - دانلود کدهای پروژه</title>
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        * { font-family: 'Vazirmatn', sans-serif; box-sizing: border-box; }
+        body { background: #FFF8F0; color: #2D2A27; margin: 0; padding: 20px; direction: rtl; }
+        .container { max-width: 900px; margin: 0 auto; }
+        h1 { color: #0191B4; font-size: 24px; margin-bottom: 10px; }
+        .info { background: #e8f4f8; border: 1px solid #0191B4; border-radius: 12px; padding: 15px; margin-bottom: 20px; }
+        .info p { margin: 5px 0; font-size: 14px; line-height: 1.8; }
+        .file-section { background: white; border: 1px solid #ddd; border-radius: 12px; margin-bottom: 15px; overflow: hidden; }
+        .file-header { background: #f5f5f5; padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #ddd; }
+        .file-name { font-weight: bold; color: #FE7A15; font-size: 14px; direction: ltr; text-align: left; }
+        .copy-btn { background: #0191B4; color: white; border: none; padding: 5px 12px; border-radius: 8px; cursor: pointer; font-size: 12px; font-family: 'Vazirmatn'; }
+        .copy-btn:hover { background: #017a94; }
+        .copy-btn.copied { background: #16a34a; }
+        pre { margin: 0; padding: 15px; overflow-x: auto; font-size: 12px; line-height: 1.6; direction: ltr; text-align: left; background: #1e1e1e; color: #d4d4d4; max-height: 400px; overflow-y: auto; }
+        code { font-family: 'Courier New', monospace; }
+        .steps { background: #f0fdf4; border: 1px solid #16a34a; border-radius: 12px; padding: 15px; margin-top: 20px; }
+        .steps h2 { color: #16a34a; margin-top: 0; font-size: 18px; }
+        .steps ol { padding-right: 20px; line-height: 2; }
+        .download-all { background: #FE7A15; color: white; border: none; padding: 12px 24px; border-radius: 12px; cursor: pointer; font-size: 16px; font-family: 'Vazirmatn'; font-weight: bold; display: block; width: 100%; margin: 20px 0; }
+        .download-all:hover { background: #e66a0a; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 SMC Analyzer - کدهای کامل پروژه</h1>
+        
+        <div class="info">
+            <p><strong>📋 راهنما:</strong> تمام فایل‌های پروژه در زیر نمایش داده شده‌اند. می‌توانید هر فایل را کپی کرده و در سیستم خود ذخیره کنید.</p>
+            <p><strong>⚡ روش سریع:</strong> دکمه «دانلود همه فایل‌ها» در پایین صفحه را بزنید تا یک فایل HTML دریافت کنید که با اجرای آن، تمام فایل‌ها به صورت خودکار ساخته می‌شوند.</p>
+        </div>
+
+        <button class="download-all" onclick="downloadAllFiles()">📦 دانلود همه فایل‌ها به صورت ZIP</button>
+
+        <div id="files-container"></div>
+
+        <div class="steps">
+            <h2>📝 مراحل نصب و اجرا:</h2>
+            <ol>
+                <li>Node.js نسخه 18+ را از <a href="https://nodejs.org" target="_blank">nodejs.org</a> دانلود و نصب کنید</li>
+                <li>تمام فایل‌های بالا را در یک پوشه جدید ذخیره کنید (ساختار پوشه‌ها را رعایت کنید)</li>
+                <li>در Command Prompt به پوشه پروژه بروید</li>
+                <li>دستور <code>npm install</code> را اجرا کنید</li>
+                <li>دستور <code>npm run build</code> را اجرا کنید</li>
+                <li>به پوشه <code>server</code> بروید و <code>npm install</code> و سپس <code>node server.js</code> را اجرا کنید</li>
+                <li>مرورگر را باز کنید: <code>http://localhost:3000</code></li>
+            </ol>
+            <p><strong>💡 یا ساده‌تر:</strong> فایل <code>Run.bat</code> را در پوشه <code>public</code> اجرا کنید تا همه مراحل خودکار انجام شود.</p>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <script>
+        // All project files
+        const projectFiles = {};
+
+        // Will be populated by the build process
+        // For now, showing a message
+        document.getElementById('files-container').innerHTML = `
+            <div class="file-section">
+                <div class="file-header">
+                    <span class="file-name">⚠️ توجه</span>
+                </div>
+                <pre><code>برای دریافت کدهای کامل پروژه، لطفاً از دکمه "دانلود ZIP" در تنظیمات داشبورد استفاده کنید.
+
+اگر دکمه ZIP کار نمی‌کند:
+1. فایل project-source.json را از آدرس /project-source.json دانلود کنید
+2. یا از داشبورد اصلی، دکمه "دانلود ZIP" را در تب تنظیمات بزنید
+3. مطمئن شوید popup blocker مرورگر غیرفعال است</code></pre>
+            </div>
+        `;
+
+        async function downloadAllFiles() {
+            try {
+                const response = await fetch('/project-source.json');
+                const data = await response.json();
+                
+                const zip = new JSZip();
+                const root = zip.folder('SMC-Analyzer');
+                
+                // Add files from JSON
+                for (const [filename, content] of Object.entries(data.files)) {
+                    if (typeof content === 'string') {
+                        root.file(filename, content);
+                    } else {
+                        root.file(filename, JSON.stringify(content, null, 2));
+                    }
+                }
+                
+                const blob = await zip.generateAsync({ type: 'blob' });
+                saveAs(blob, 'SMC-Analyzer.zip');
+            } catch (error) {
+                alert('خطا در دانلود: ' + error.message);
+            }
+        }
+
+        function copyToClipboard(text, btn) {
+            navigator.clipboard.writeText(text).then(() => {
+                btn.textContent = '✓ کپی شد';
+                btn.classList.add('copied');
+                setTimeout(() => {
+                    btn.textContent = 'کپی';
+                    btn.classList.remove('copied');
+                }, 2000);
+            });
+        }
+    </script>
+</body>
+</html>

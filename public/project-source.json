@@ -1,0 +1,65 @@
+{
+  "project": "SMC-Analyzer",
+  "version": "1.0.0",
+  "description": "داشبورد تحلیل هوشمند ارز دیجیتال - Dow Theory + SMC",
+  "files": {
+    "index.html": "<!doctype html>\n<html lang=\"fa\" dir=\"rtl\">\n  <head>\n    <meta charset=\"UTF-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n    <title>داشبورد تحلیل هوشمند ارز دیجیتال</title>\n    <link href=\"https://fonts.googleapis.com/css2?family=Vazirmatn:wght@100;200;300;400;500;600;700;800;900&display=swap\" rel=\"stylesheet\">\n    <style>* { font-family: 'Vazirmatn', sans-serif !important; }</style>\n  </head>\n  <body>\n    <div id=\"root\"></div>\n    <script type=\"module\" src=\"/src/main.tsx\"></script>\n  </body>\n</html>",
+    
+    "package.json": {
+      "name": "smc-analyzer",
+      "version": "1.0.0",
+      "private": true,
+      "type": "module",
+      "scripts": {
+        "dev": "vite",
+        "build": "vite build",
+        "preview": "vite preview"
+      },
+      "dependencies": {
+        "react": "^18.2.0",
+        "react-dom": "^18.2.0",
+        "recharts": "^2.10.0",
+        "lucide-react": "^0.294.0",
+        "jszip": "^3.10.1",
+        "file-saver": "^2.0.5"
+      },
+      "devDependencies": {
+        "@vitejs/plugin-react": "^4.3.4",
+        "vite": "^6.3.5",
+        "tailwindcss": "^4.1.7",
+        "@tailwindcss/vite": "^4.1.7",
+        "typescript": "^5.7.0"
+      }
+    },
+
+    "vite.config.js": "import { defineConfig } from 'vite';\nimport react from '@vitejs/plugin-react';\nimport tailwindcss from '@tailwindcss/vite';\n\nexport default defineConfig({\n  plugins: [react(), tailwindcss()],\n  server: { port: 5173 },\n  build: { outDir: 'dist' }\n});",
+
+    "tsconfig.json": {
+      "compilerOptions": {
+        "target": "ES2020",
+        "useDefineForClassFields": true,
+        "lib": ["ES2020", "DOM", "DOM.Iterable"],
+        "module": "ESNext",
+        "skipLibCheck": true,
+        "moduleResolution": "bundler",
+        "allowImportingTsExtensions": true,
+        "resolveJsonModule": true,
+        "isolatedModules": true,
+        "noEmit": true,
+        "jsx": "react-jsx",
+        "strict": true
+      },
+      "include": ["src"]
+    },
+
+    "src/main.tsx": "import React from \"react\";\nimport ReactDOM from \"react-dom/client\";\nimport \"./index.css\";\nimport App from \"./App.tsx\";\n\nReactDOM.createRoot(document.getElementById(\"root\")!).render(<App />);",
+
+    "src/types.ts": "export interface CoinData {\n  id: string;\n  symbol: string;\n  name: string;\n  price: number;\n  change24h: number;\n  change7d: number;\n  volume24h: number;\n  marketCap: number;\n  high24h: number;\n  low24h: number;\n  sparkline?: number[];\n}\n\nexport interface AnalysisResult {\n  coinId: string;\n  symbol: string;\n  name: string;\n  score: number;\n  dowTrend: 'bullish' | 'bearish' | 'neutral';\n  smcSignal: 'buy' | 'sell' | 'wait';\n  orderBlock?: { type: 'bullish' | 'bearish'; price: number };\n  fairValueGap?: { type: 'bullish' | 'bearish'; high: number; low: number };\n  breakOfStructure?: { type: 'bullish' | 'bearish'; price: number };\n  liquidityZone?: { level: number; type: 'buy' | 'sell' };\n  reason: string;\n  targetPrice: number;\n  stopLoss: number;\n  confidence: number;\n}\n\nexport interface PriceAlert {\n  id: string;\n  coinId: string;\n  symbol: string;\n  targetPrice: number;\n  direction: 'above' | 'below';\n  active: boolean;\n  createdAt: number;\n  triggered: boolean;\n}\n\nexport interface NotificationSettings {\n  browserNotification: boolean;\n  email: { enabled: boolean; address: string; smtpServer: string; smtpPort: number; smtpUser: string; smtpPass: string; };\n  telegram: { enabled: boolean; botToken: string; chatId: string; };\n  discord: { enabled: boolean; webhookUrl: string; };\n  twitter: { enabled: boolean; apiKey: string; apiSecret: string; accessToken: string; accessSecret: string; };\n}\n\nexport interface AppState {\n  watchlist: AnalysisResult[];\n  alerts: PriceAlert[];\n  settings: NotificationSettings;\n  isLoading: boolean;\n  lastUpdate: number | null;\n  activeTab: 'watchlist' | 'alerts' | 'settings' | 'analysis';\n}",
+
+    "README.md": "# SMC Analyzer\n\nداشبورد تحلیل هوشمند ارز دیجیتال با استفاده از Dow Theory و Smart Money Concepts\n\n## نصب و اجرا\n\n1. Node.js را نصب کنید (https://nodejs.org)\n2. فایل‌ها را اکسترکت کنید\n3. در پوشه پروژه:\n   ```bash\n   npm install\n   npm run build\n   cd server && npm install && cd ..\n   cd server && node server.js\n   ```\n4. مرورگر را باز کنید: http://localhost:3000\n\n## یا به سادگی:\n\nفایل `Run.bat` را در پوشه `public` اجرا کنید.\n\n## امکانات\n\n- تحلیل Dow Theory و SMC\n- واچ‌لیست ۱۰ ارز برتر\n- آلارم قیمتی\n- نوتیفیکیشن مرورگر، ایمیل، تلگرام، دیسکورد، توییتر\n- طراحی فارسی RTL\n\n## APIها\n\n- CoinGecko (عمومی)\n- CoinMarketCap (عمومی)\n- Bitunix (عمومی)\n- Toobit (عمومی)"
+  },
+  "instructions": {
+    "quick_start": "1. Node.js نصب کنید\n2. این فایل JSON را دانلود کنید\n3. با ابزار آنلاین JSON به ZIP تبدیل کنید یا دستی فایل‌ها را بسازید\n4. Run.bat را اجرا کنید",
+    "manual_setup": "1. npm install\n2. npm run build\n3. cd server && npm install\n4. node server.js"
+  }
+}

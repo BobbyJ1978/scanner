@@ -6,6 +6,7 @@ import {
 import { useState } from 'react';
 import JSZip from 'jszip';
 import { saveAs } from 'file-saver';
+import { SOURCE_FILES } from '../sourceFiles';
 
 interface SettingsProps {
   settings: NotificationSettings;
@@ -24,7 +25,12 @@ export default function Settings({ settings, onUpdate, onRequestNotification }: 
       const zip = new JSZip();
       const project = zip.folder('SMC-Analyzer')!;
 
-      // Fetch all project files (public files)
+      // Add source files from embedded data
+      for (const [path, content] of Object.entries(SOURCE_FILES)) {
+        project.file(path, content);
+      }
+
+      // Fetch public files
       const publicFiles = [
         { path: 'config.json', url: '/config.json' },
         { path: 'Run.bat', url: '/Run.bat' },
@@ -34,40 +40,20 @@ export default function Settings({ settings, onUpdate, onRequestNotification }: 
         { path: 'server/package.json', url: '/server/package.json' },
       ];
 
-      // Fetch source code files
-      const sourceFiles = [
-        { path: 'src/App.tsx', url: '/source/App.tsx' },
-        { path: 'src/main.tsx', url: '/source/main.tsx' },
-        { path: 'src/types.ts', url: '/source/types.ts' },
-        { path: 'src/index.css', url: '/source/index.css' },
-        { path: 'src/utils/api.ts', url: '/source/utils/api.ts' },
-        { path: 'src/utils/analysis.ts', url: '/source/utils/analysis.ts' },
-        { path: 'src/components/Sidebar.tsx', url: '/source/components/Sidebar.tsx' },
-        { path: 'src/components/Header.tsx', url: '/source/components/Header.tsx' },
-        { path: 'src/components/Watchlist.tsx', url: '/source/components/Watchlist.tsx' },
-        { path: 'src/components/Alerts.tsx', url: '/source/components/Alerts.tsx' },
-        { path: 'src/components/Settings.tsx', url: '/source/components/Settings.tsx' },
-        { path: 'src/components/AnalysisPanel.tsx', url: '/source/components/AnalysisPanel.tsx' },
-      ];
-
-      const allFiles = [...publicFiles, ...sourceFiles];
-
-      for (const file of allFiles) {
+      for (const file of publicFiles) {
         try {
           const response = await fetch(file.url);
           if (response.ok) {
             const content = await response.text();
             project.file(file.path, content);
-          } else {
-            console.warn(`File not found: ${file.path}`);
           }
         } catch (e) {
-          console.warn(`Failed to fetch ${file.path}:`, e);
+          console.warn('Failed to fetch:', file.path);
         }
       }
 
-      // Add package.json for frontend
-      const frontendPackageJson = {
+      // Add package.json
+      const packageJson = {
         name: "smc-analyzer",
         version: "1.0.0",
         private: true,
@@ -93,7 +79,7 @@ export default function Settings({ settings, onUpdate, onRequestNotification }: 
           typescript: "^5.7.0"
         }
       };
-      project.file('package.json', JSON.stringify(frontendPackageJson, null, 2));
+      project.file('package.json', JSON.stringify(packageJson, null, 2));
 
       // Add vite.config.js
       const viteConfig = `import { defineConfig } from 'vite';
@@ -102,14 +88,9 @@ import tailwindcss from '@tailwindcss/vite';
 
 export default defineConfig({
   plugins: [react(), tailwindcss()],
-  server: {
-    port: 5173,
-  },
-  build: {
-    outDir: 'dist',
-  },
-});
-`;
+  server: { port: 5173 },
+  build: { outDir: 'dist' }
+});`;
       project.file('vite.config.js', viteConfig);
 
       // Add tsconfig.json
@@ -126,13 +107,9 @@ export default defineConfig({
           isolatedModules: true,
           noEmit: true,
           jsx: "react-jsx",
-          strict: true,
-          noUnusedLocals: true,
-          noUnusedParameters: true,
-          noFallthroughCasesInSwitch: true
+          strict: true
         },
-        include: ["src"],
-        references: [{ path: "./tsconfig.node.json" }]
+        include: ["src"]
       };
       project.file('tsconfig.json', JSON.stringify(tsConfig, null, 2));
 
@@ -142,15 +119,9 @@ export default defineConfig({
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>داشبورد تحلیل هوشمند ارز دیجیتال - SMC & Dow Theory</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <title>داشبورد تحلیل هوشمند ارز دیجیتال</title>
     <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-    <style>
-      * { font-family: 'Vazirmatn', sans-serif !important; }
-      html, body { margin: 0; padding: 0; width: 100%; height: 100%; }
-    </style>
+    <style>* { font-family: 'Vazirmatn', sans-serif !important; }</style>
   </head>
   <body>
     <div id="root"></div>
@@ -159,12 +130,12 @@ export default defineConfig({
 </html>`;
       project.file('index.html', indexHtml);
 
-      // Generate and download ZIP
+      // Generate and download
       const blob = await zip.generateAsync({ type: 'blob' });
       saveAs(blob, 'SMC-Analyzer.zip');
     } catch (error) {
       console.error('Download error:', error);
-      alert('خطا در دانلود فایل‌ها. لطفاً دوباره تلاش کنید.');
+      alert('خطا در دانلود. لطفاً دوباره تلاش کنید.');
     } finally {
       setDownloading(false);
     }
@@ -190,7 +161,7 @@ export default defineConfig({
     <div className="space-y-6 animate-fade-in max-w-4xl">
       {/* Download Button */}
       <div className="bg-gradient-to-l from-accent2/10 to-accent3/10 rounded-2xl p-5 border border-accent2/20">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-accent2 to-accent3 flex items-center justify-center shadow-lg">
               <Download className="w-6 h-6 text-white" />
@@ -198,7 +169,7 @@ export default defineConfig({
             <div>
               <h3 className="font-bold text-text">دانلود کامل برنامه</h3>
               <p className="text-xs text-gray-dark mt-0.5">
-                تمام فایل‌های پروژه شامل سرور، تنظیمات و اسکریپت اجرا
+                تمام فایل‌های پروژه شامل کد منبع، سرور و تنظیمات
               </p>
             </div>
           </div>
@@ -221,12 +192,35 @@ export default defineConfig({
           </button>
         </div>
         <div className="mt-3 pt-3 border-t border-accent2/10">
-          <p className="text-xs text-gray-dark leading-6">
-            📦 فایل ZIP شامل: <code className="bg-white px-1.5 py-0.5 rounded text-[10px]">Run.bat</code> (اجرای خودکار)، 
-            <code className="bg-white px-1.5 py-0.5 rounded text-[10px] mr-1">config.json</code> (تنظیمات)، 
-            <code className="bg-white px-1.5 py-0.5 rounded text-[10px] mr-1">server/</code> (سرور بک‌اند)، 
-            <code className="bg-white px-1.5 py-0.5 rounded text-[10px] mr-1">requirements.txt</code> (ملزومات)
+          <p className="text-xs text-gray-dark leading-6 mb-2">
+            📦 فایل ZIP شامل: کد منبع (src/)، Run.bat، config.json، server/، package.json، vite.config.js
           </p>
+          <div className="flex flex-wrap gap-2">
+            <a 
+              href="/project-source.json" 
+              download="SMC-Analyzer-Source.json"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-primary/10 text-primary text-xs font-medium hover:bg-primary/20 transition-colors"
+            >
+              <Download className="w-3 h-3" />
+              دانلود JSON (تمام کدها)
+            </a>
+            <a 
+              href="/download.html" 
+              target="_blank"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-accent2/10 text-accent2 text-xs font-medium hover:bg-accent2/20 transition-colors"
+            >
+              <Download className="w-3 h-3" />
+              صفحه دانلود کامل
+            </a>
+          </div>
+          <div className="mt-3 bg-yellow-50 rounded-xl p-3 border border-yellow-200">
+            <p className="text-xs text-yellow-800 leading-6">
+              <strong>💡 راهنمای دانلود:</strong><br/>
+              ۱. دکمه «دانلود JSON» را بزنید → فایل شامل تمام کدها است<br/>
+              ۲. یا «صفحه دانلود کامل» را باز کنید → راهنمای تصویری دارد<br/>
+              ۳. فایل‌ها در پوشه <code className="bg-white px-1 rounded">Downloads</code> ویندوز ذخیره می‌شوند
+            </p>
+          </div>
         </div>
       </div>
 
