@@ -1,7 +1,7 @@
 import { AppState } from '../types';
 import { 
   BarChart3, Bell, Settings, TrendingUp, 
-  Activity, Shield
+  Activity, Shield, Download
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -11,6 +11,7 @@ interface SidebarProps {
 
 export default function Sidebar({ activeTab, onTabChange }: SidebarProps) {
   const menuItems = [
+    { id: 'download' as const, label: 'دانلود و نصب', icon: Download },
     { id: 'watchlist' as const, label: 'واچ‌لیست', icon: TrendingUp },
     { id: 'analysis' as const, label: 'تحلیل تکنیکال', icon: BarChart3 },
     { id: 'alerts' as const, label: 'آلارم‌ها', icon: Bell },
